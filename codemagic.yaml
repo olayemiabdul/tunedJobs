@@ -4,13 +4,13 @@ workflows:
     instance_type: mac_mini_m1
     environment:
       vars:
-        BUNDLE_ID: "your.bundle.identifier"  # Replace with your bundle ID
+        BUNDLE_ID: "tunedtech.uk.tunedJobs"  #  bundle ID
       xcode: latest
       cocoapods: default
       flutter: stable
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: tunedtech.uk.tunedJobs
+        bundle_identifier: $BUNDLE_ID
     cache:
       cache_paths:
         - ~/.pub-cache
