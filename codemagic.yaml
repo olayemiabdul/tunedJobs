@@ -1,0 +1,56 @@
+workflows:
+  ios-workflow:
+    name: iOS Production
+    instance_type: mac_mini_m1
+    environment:
+      vars:
+        BUNDLE_ID: "your.bundle.identifier"  # Replace with your bundle ID
+      xcode: latest
+      cocoapods: default
+      flutter: stable
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: $BUNDLE_ID
+    cache:
+      cache_paths:
+        - ~/.pub-cache
+        - $FLUTTER_ROOT/.pub-cache
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+    scripts:
+      - name: Set up code signing
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE
+          keychain add-certificates
+      - name: Install Flutter dependencies
+        script: |
+          flutter pub get
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios
+          pod install
+      - name: Flutter build
+        script: |
+          flutter build ios --release --no-codesign
+      - name: Build iOS
+        script: |
+          xcode-project build-ipa \
+            --workspace ios/Runner.xcworkspace \
+            --scheme Runner \
+            --config Release
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true  # Enable for TestFlight
+        submit_to_app_store: true   # Enable for App Store
+        beta_groups:                # Optional TestFlight groups
+          - "Internal Testers"
