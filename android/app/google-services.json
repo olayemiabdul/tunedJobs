@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "315632173712",
+    "project_id": "tunedjobss",
+    "storage_bucket": "tunedjobss.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:315632173712:android:01b310e789829aa02fce15",
+        "android_client_info": {
+          "package_name": "tunedtech.uk.tuned_jobs"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmA1uwnFCAjvEpdy7HGUvlSGRiSSO1o-E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
