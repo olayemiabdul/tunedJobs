@@ -17,7 +17,7 @@ workflows:
         provisioning_profiles:
           - abdul
         certificates:
-          - distribution
+          - development_Certificates
     cache:
       cache_paths:
         - ~/.pub-cache
