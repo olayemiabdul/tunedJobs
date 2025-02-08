@@ -1,67 +1,15 @@
 workflows:
+
   ios-workflow:
-    name: iOS Production
-    instance_type: mac_mini_m1
+
+    name: iOS Workflow
+
+    # ....
+
     environment:
-      vars:
-        BUNDLE_ID: "tunedtech.uk.tunedJobs"
-        XCODE_WORKSPACE: "ios/Runner.xcworkspace"
-        XCODE_SCHEME: "Runner"
-        # Add these as environment variables
-        APP_STORE_APPLE_ID: olayemi.abdullahi9585@gmail.com
-        APP_SPECIFIC_PASSWORD: jhiv-spnz-rgpj-wfbo
-      xcode: latest
-      cocoapods: default
-      flutter: stable
+
       ios_signing:
-        provisioning_profiles:
-          - tunedtech.uk.tunedJobs
-        certificates:
-          - distribution
-    cache:
-      cache_paths:
-        - ~/.pub-cache
-        - $FLUTTER_ROOT/.pub-cache
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: 'main'
-          include: true
-    scripts:
-      - name: Set up code signing
-        script: |
-          keychain initialize
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --create \
-            --apple-id "$APP_STORE_APPLE_ID" \
-            --password "$APP_SPECIFIC_PASSWORD"
-          keychain add-certificates
-      - name: Install Flutter dependencies
-        script: |
-          flutter pub get
-      - name: Install CocoaPods dependencies
-        script: |
-          cd ios
-          pod install
-      - name: Flutter build
-        script: |
-          flutter build ios --release --no-codesign
-      - name: Build iOS
-        script: |
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME" \
-            --config Release
-    artifacts:
-      - build/ios/ipa/*.ipa
-    publishing:
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
-        submit_to_app_store: true
-        beta_groups:
-          - "Internal Testers"
+
+        distribution_type: app_store # or: ad_hoc | development | enterprise
+
+        bundle_identifier: tunedtech.uk.tunedJobs
