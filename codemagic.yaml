@@ -7,7 +7,6 @@ workflows:
         BUNDLE_ID: "tunedtech.uk.tunedJobs"
         XCODE_WORKSPACE: "ios/Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
-        # Add these as environment variables
         APP_STORE_APPLE_ID: olayemi.abdullahi9585@gmail.com
         APP_SPECIFIC_PASSWORD: jhiv-spnz-rgpj-wfbo
       xcode: latest
@@ -15,9 +14,9 @@ workflows:
       flutter: stable
       ios_signing:
         provisioning_profiles:
-          - abdul
+          - abdul  # Ensure this matches the profile name in Codemagic UI
         certificates:
-          - development_Certificates
+          - development_Certificates  # Ensure this matches the certificate name in Codemagic UI
     cache:
       cache_paths:
         - ~/.pub-cache
@@ -38,24 +37,32 @@ workflows:
             --apple-id "$APP_STORE_APPLE_ID" \
             --password "$APP_SPECIFIC_PASSWORD"
           keychain add-certificates
+
       - name: Install Flutter dependencies
         script: |
           flutter pub get
+
       - name: Install CocoaPods dependencies
         script: |
           cd ios
+          pod repo update
           pod install
+
       - name: Flutter build
         script: |
           flutter build ios --release --no-codesign
-      - name: Build iOS
+
+      - name: Manually Sign and Build iOS
         script: |
+          xcode-project use-profiles
           xcode-project build-ipa \
             --workspace "$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME" \
             --config Release
+
     artifacts:
       - build/ios/ipa/*.ipa
+
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
