@@ -4,13 +4,20 @@ workflows:
     instance_type: mac_mini_m1
     environment:
       vars:
-        BUNDLE_ID: "tunedtech.uk.tunedJobs"  #  bundle ID
+        BUNDLE_ID: "tunedtech.uk.tunedJobs"
+        XCODE_WORKSPACE: "ios/Runner.xcworkspace"
+        XCODE_SCHEME: "Runner"
+        # Add these as environment variables
+        APP_STORE_APPLE_ID: olayemi.abdullahi9585@gmail.com
+        APP_SPECIFIC_PASSWORD: jhiv-spnz-rgpj-wfbo
       xcode: latest
       cocoapods: default
       flutter: stable
       ios_signing:
-        distribution_type: app_store
-        bundle_identifier: $BUNDLE_ID
+        provisioning_profiles:
+          - tunedtech.uk.tunedJobs
+        certificates:
+          - distribution
     cache:
       cache_paths:
         - ~/.pub-cache
@@ -25,7 +32,11 @@ workflows:
       - name: Set up code signing
         script: |
           keychain initialize
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create \
+            --apple-id "$APP_STORE_APPLE_ID" \
+            --password "$APP_SPECIFIC_PASSWORD"
           keychain add-certificates
       - name: Install Flutter dependencies
         script: |
@@ -40,8 +51,8 @@ workflows:
       - name: Build iOS
         script: |
           xcode-project build-ipa \
-            --workspace ios/Runner.xcworkspace \
-            --scheme Runner \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME" \
             --config Release
     artifacts:
       - build/ios/ipa/*.ipa
@@ -50,7 +61,7 @@ workflows:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true  # Enable for TestFlight
-        submit_to_app_store: true   # Enable for App Store
-        beta_groups:                # Optional TestFlight groups
+        submit_to_testflight: true
+        submit_to_app_store: true
+        beta_groups:
           - "Internal Testers"
