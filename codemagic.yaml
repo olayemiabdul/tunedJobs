@@ -9,6 +9,9 @@ workflows:
         XCODE_SCHEME: "Runner"
         APP_STORE_APPLE_ID: olayemi.abdullahi9585@gmail.com
         APP_SPECIFIC_PASSWORD: jhiv-spnz-rgpj-wfbo
+        # Add these environment variables
+        FLUTTER_DEBUG: true
+        COCOAPODS_DISABLE_STATS: true
       xcode: latest
       cocoapods: default
       flutter: stable
@@ -28,13 +31,25 @@ workflows:
         - pattern: 'main'
           include: true
     scripts:
-      - name: Update iOS deployment target
+      - name: Update iOS deployment target and build settings
         script: |
           cd ios
           sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = .*;/IPHONEOS_DEPLOYMENT_TARGET = 12.0;/' Podfile
-          echo "platform :ios, '12.0'" > Podfile.new
-          cat Podfile >> Podfile.new
-          mv Podfile.new Podfile
+          # Add post_install hook with architecture settings
+          cat >> Podfile << 'EOL'
+          
+          post_install do |installer|
+            installer.pods_project.targets.each do |target|
+              flutter_additional_ios_build_settings(target)
+              target.build_configurations.each do |config|
+                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+                config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+                config.build_settings["DEVELOPMENT_TEAM"] = "YOUR_TEAM_ID" # Replace with your team ID
+                config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+              end
+            end
+          end
+          EOL
       - name: Set up code signing
         script: |
           keychain initialize
@@ -51,10 +66,12 @@ workflows:
       - name: Install CocoaPods dependencies
         script: |
           cd ios
+          rm -rf Pods/
+          rm -rf Podfile.lock
           pod repo update
           pod deintegrate
           pod setup
-          pod install
+          pod install --repo-update
       - name: Flutter build
         script: |
           flutter build ios --release --no-codesign
