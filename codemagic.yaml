@@ -7,13 +7,10 @@ workflows:
         BUNDLE_ID: "tunedtech.uk.tunedJobs"
         XCODE_WORKSPACE: "ios/Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
-      xcode: latest # Consider specifying a specific version if needed
+      xcode: latest
       cocoapods: default
       flutter: stable
       ios_signing:
-        distribution_type: app_store
-        bundle_identifier: $BUNDLE_ID
-        # Add these signing configurations
         provisioning_profiles:
           - tunedtech.uk.tunedJobs
         certificates:
@@ -32,7 +29,6 @@ workflows:
       - name: Set up code signing
         script: |
           keychain initialize
-          # Updated fetch-signing-files command with specific certificate type
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --create
