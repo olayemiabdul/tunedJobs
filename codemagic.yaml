@@ -9,7 +9,7 @@ workflows:
         XCODE_SCHEME: "Runner"
         APP_STORE_APPLE_ID: "olayemi.abdullahi9585@gmail.com"
       groups:
-        - app_store_credentials  # Store the password securely in Codemagic
+        - app_store_credentials  # Securely store the app-specific password in Codemagic
       xcode: latest
       cocoapods: default
       flutter: stable
