@@ -14,9 +14,9 @@ workflows:
       flutter: stable
       ios_signing:
         provisioning_profiles:
-          - abdul  # Ensure this matches the profile name in Codemagic UI
+          - abdul
         certificates:
-          - development_Certificates  # Ensure this matches the certificate name in Codemagic UI
+          - development_Certificates
     cache:
       cache_paths:
         - ~/.pub-cache
@@ -28,6 +28,13 @@ workflows:
         - pattern: 'main'
           include: true
     scripts:
+      - name: Update iOS deployment target
+        script: |
+          cd ios
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = .*;/IPHONEOS_DEPLOYMENT_TARGET = 12.0;/' Podfile
+          echo "platform :ios, '12.0'" > Podfile.new
+          cat Podfile >> Podfile.new
+          mv Podfile.new Podfile
       - name: Set up code signing
         script: |
           keychain initialize
@@ -37,21 +44,20 @@ workflows:
             --apple-id "$APP_STORE_APPLE_ID" \
             --password "$APP_SPECIFIC_PASSWORD"
           keychain add-certificates
-
       - name: Install Flutter dependencies
         script: |
+          flutter clean
           flutter pub get
-
       - name: Install CocoaPods dependencies
         script: |
           cd ios
           pod repo update
+          pod deintegrate
+          pod setup
           pod install
-
       - name: Flutter build
         script: |
           flutter build ios --release --no-codesign
-
       - name: Manually Sign and Build iOS
         script: |
           xcode-project use-profiles
@@ -59,10 +65,8 @@ workflows:
             --workspace "$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME" \
             --config Release
-
     artifacts:
       - build/ios/ipa/*.ipa
-
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
