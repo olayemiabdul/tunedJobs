@@ -7,17 +7,12 @@ workflows:
         BUNDLE_ID: "tunedtech.uk.tunedJobs"
         XCODE_WORKSPACE: "ios/Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
-        # Add these as environment variables
-        APP_STORE_APPLE_ID: olayemi.abdullahi9585@gmail.com
-        APP_SPECIFIC_PASSWORD: jhiv-spnz-rgpj-wfbo
+        APP_STORE_APPLE_ID: "olayemi.abdullahi9585@gmail.com"
+      groups:
+        - app_store_credentials  # Securely store the app-specific password in Codemagic
       xcode: latest
       cocoapods: default
       flutter: stable
-      ios_signing:
-        provisioning_profiles:
-          - tunedtech.uk.tunedJobs
-        certificates:
-          - distribution
     cache:
       cache_paths:
         - ~/.pub-cache
@@ -36,7 +31,7 @@ workflows:
             --type IOS_APP_STORE \
             --create \
             --apple-id "$APP_STORE_APPLE_ID" \
-            --password "$APP_SPECIFIC_PASSWORD"
+            --password "$APP_STORE_PASSWORD"
           keychain add-certificates
       - name: Install Flutter dependencies
         script: |
@@ -58,9 +53,8 @@ workflows:
       - build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        apple_id: "$APP_STORE_APPLE_ID"
+        password: "$APP_STORE_PASSWORD"
         submit_to_testflight: true
         submit_to_app_store: true
         beta_groups:
