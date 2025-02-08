@@ -7,6 +7,9 @@ workflows:
         BUNDLE_ID: "tunedtech.uk.tunedJobs"
         XCODE_WORKSPACE: "ios/Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
+        # Add these as environment variables
+        APP_STORE_APPLE_ID: olayemi.abdullahi9585@gmail.com
+        APP_SPECIFIC_PASSWORD: jhiv-spnz-rgpj-wfbo
       xcode: latest
       cocoapods: default
       flutter: stable
@@ -15,8 +18,6 @@ workflows:
           - tunedtech.uk.tunedJobs
         certificates:
           - distribution
-        apple_id: olayemi.abdullahi9585@gmail.com  # Your Apple ID
-        password: jhiv-spnz-rgpj-wfbo  # Your app-specific password
     cache:
       cache_paths:
         - ~/.pub-cache
@@ -33,7 +34,9 @@ workflows:
           keychain initialize
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
-            --create
+            --create \
+            --apple-id "$APP_STORE_APPLE_ID" \
+            --password "$APP_SPECIFIC_PASSWORD"
           keychain add-certificates
       - name: Install Flutter dependencies
         script: |
@@ -55,8 +58,9 @@ workflows:
       - build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
-        apple_id: olayemi.abdullahi9585@gmail.com  # Your Apple ID
-        password: jhiv-spnz-rgpj-wfbo  # Your app-specific password
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
         submit_to_app_store: true
         beta_groups:
