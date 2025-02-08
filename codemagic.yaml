@@ -7,17 +7,17 @@ workflows:
         BUNDLE_ID: "tunedtech.uk.tunedJobs"
         XCODE_WORKSPACE: "ios/Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
-        APP_STORE_APPLE_ID: olayemi.abdullahi9585@gmail.com
+        APP_STORE_APPLE_ID: "olayemi.abdullahi9585@gmail.com"   # Set the Apple ID here
       groups:
-        - app_store_credentials
+        - app_store_credentials    # Add environment variable group
       xcode: latest
       cocoapods: default
       flutter: stable
       ios_signing:
         provisioning_profiles:
-          - tunedtech.uk.tunedJobs
+          - "tunedtech.uk.tunedJobs"   # Your provisioning profile for iOS
         certificates:
-          - distribution
+          - distribution  # Your distribution certificate
     cache:
       cache_paths:
         - ~/.pub-cache
@@ -58,8 +58,8 @@ workflows:
       - build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
-        apple_id: $APP_STORE_APPLE_ID
-        password: $APP_STORE_PASSWORD
+        apple_id: "$APP_STORE_APPLE_ID"
+        password: "$APP_STORE_PASSWORD"
         submit_to_testflight: true
         submit_to_app_store: true
         beta_groups:
