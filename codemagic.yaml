@@ -15,7 +15,7 @@ workflows:
       flutter: stable
       ios_signing:
         provisioning_profiles:
-          - tunedtech.uk.tunedJobs
+          - abdul
         certificates:
           - distribution
     cache:
