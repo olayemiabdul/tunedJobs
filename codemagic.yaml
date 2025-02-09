@@ -27,6 +27,7 @@ workflows:
         script: |
           cd ios
           sed -i '' 's/platform :ios, '9.0'/platform :ios, '12.0'/' Podfile # Ensure correct deployment target
+          find Pods -name "*.podspec" -exec sed -i '' 's/\(s\.ios\.deployment_target\s*=\s*\)\("9.0"\|"10.0"\)/\112.0/' {} \; # Update all pod dependencies
           pod install --repo-update
 
       - name: Flutter build
