@@ -4,7 +4,7 @@ workflows:
     instance_type: mac_mini_m1
     environment:
       vars:
-        BUNDLE_ID: "tunedtech.uk.tunedJobs"
+        BUNDLE_ID: "tunedtech.uk.tunedJobs" # Ensure this is correct
         XCODE_WORKSPACE: "ios/Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
         APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY
@@ -12,19 +12,22 @@ workflows:
         APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
         FLUTTER_DEBUG: true
         COCOAPODS_DISABLE_STATS: true
-      xcode: "15.0"
+      xcode: "15.0" # Or specify the Xcode version you need
       cocoapods: default
       flutter: stable
       ios_signing:
-        distribution_type: app_store
-        bundle_identifier: tunedtech.uk.tunedJobs
+        distribution_type: app_store # Use this for App Store submission
+        bundle_identifier: tunedtech.uk.tunedJobs # Ensure this is correct!
+        provisioning_profiles: # Use automatic signing or manual
+          - tunedjobs # Name of the provisioning profile you uploaded
+        certificates:
+          - Distribution_Certificate # Name of the certificate you uploaded
+      # OR, if using AUTOMATIC signing:
+      # ios_signing:
+      #   automatic: true
+      #   team_id: "YOUR_TEAM_ID" # Your Apple Developer Team ID
 
     scripts:
-      - name: Set up environment
-        script: |
-          flutter doctor -v
-          xcodebuild -version
-
       - name: Install Flutter dependencies
         script: |
           flutter clean
@@ -35,38 +38,52 @@ workflows:
           cd ios
           pod install --repo-update
 
-      - name: Build and Sign IPA
+      - name: Flutter build
         script: |
-          cd ios
-          # Create archive
-          xcodebuild -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -archivePath build/Runner.xcarchive \
-            archive \
-            -allowProvisioningUpdates
+          flutter build ios --release --no-codesign # Important: No codesign here!
 
-          # Export IPA
-          xcodebuild -exportArchive \
-            -archivePath build/Runner.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath build/ios/ipa \
-            -allowProvisioningUpdates
+      # The following scripts are likely redundant or incorrect
+      # CodeMagic's built-in signing handles this
+      # - name: keychian
+      #   script: keychain initialize
+      # - name: add certificate
+      #   script: keychain add-certificates
+      # - name: xcode
+      #   script: xcode-project use-profiles
+      # - name: packages
+      #   script: flutter-packages-pub-get
+
+      - name: Build and Sign IPA (Recommended)
+        script: |
+          flutter build ios --release --export-options-plist=ios/exportOptions.plist
+
+      # OR, if you MUST use xcodebuild directly:
+      # - name: Build iOS IPA (Alternative)
+      #   script: |
+      #     cd ios
+      #     xcodebuild -workspace Runner.xcworkspace \
+      #       -scheme Runner \
+      #       -configuration Release \
+      #       -archivePath build/Runner.xcarchive \
+      #       archive \
+      #       -allowProvisioningUpdates \
+      #       DEVELOPMENT_TEAM="YOUR_TEAM_ID" # Your Team ID (if manual signing)
+
+      #     xcodebuild -exportArchive \
+      #       -archivePath build/Runner.xcarchive \
+      #       -exportOptionsPlist ios/exportOptions.plist \
+      #       -exportPath build/ios/ipa \
+      #       -allowProvisioningUpdates
 
     artifacts:
-      - build/ios/ipa/*.ipa
+      - build/ios/ipa/*.ipa  # Correct path
 
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
+        submit_to_testflight: true  # Or false
         submit_to_app_store: true
         beta_groups:
-          - "tuned group"
-
-    cache:
-      cache_paths:
-        - $HOME/.pub-cache
-        - $HOME/Library/Developer/Xcode/DerivedData
+          - "Internal Testers" # Replace with your TestFlight group name
