@@ -16,11 +16,10 @@ workflows:
       cocoapods: default
       flutter: stable
       ios_signing:
+        automatic: true
+        team_id: "UVARSZGUFK"  # Your Team ID
         distribution_type: app_store
         bundle_identifier: tunedtech.uk.tunedJobs
-        code_signing_identity: "iPhone Distribution"
-        provisioning_profiles:
-          "tunedtech.uk.tunedJobs": "Tuned Jobs App Store"  # Replace with your actual profile name
 
     scripts:
       - name: Set up environment
@@ -40,21 +39,7 @@ workflows:
 
       - name: Build and Sign IPA
         script: |
-          cd ios
-          # Create archive
-          xcodebuild -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -archivePath build/Runner.xcarchive \
-            archive \
-            -allowProvisioningUpdates
-
-          # Export IPA
-          xcodebuild -exportArchive \
-            -archivePath build/Runner.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath build/ios/ipa \
-            -allowProvisioningUpdates
+          flutter build ios --release --export-options=ios/exportOptions.plist # Important: Correct command
 
     artifacts:
       - build/ios/ipa/*.ipa
