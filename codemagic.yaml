@@ -16,12 +16,6 @@ workflows:
       cocoapods: default
       flutter: stable
 
-    ios_signing:
-      provisioning_profiles:
-        - tunedjobs # Name of the provisioning profile you uploaded
-      certificates:
-        - Distribution_Certificate # Name of the certificate you uploaded
-
     scripts:
       - name: Install Flutter dependencies
         script: |
