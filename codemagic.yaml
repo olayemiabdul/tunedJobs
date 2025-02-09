@@ -1,26 +1,25 @@
 workflows:
   ios-workflow:
     name: iOS Production
-    instance_type: mac_mini_m1 # Or a larger instance if needed
+    instance_type: mac_mini_m1
     environment:
       vars:
         BUNDLE_ID: "tunedtech.uk.tunedJobs"
         XCODE_WORKSPACE: "ios/Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
-        APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY # API Key
-        APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER # Key ID
-        APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID # Issuer ID
-        # Optional:
+        APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY
+        APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
         FLUTTER_DEBUG: true
         COCOAPODS_DISABLE_STATS: true
-      xcode: "15.0" # Or "latest" for the latest Xcode 15.x
+      xcode: "15.0"
       cocoapods: default
       flutter: stable
       ios_signing:
         provisioning_profiles:
-          - abdul # Make sure this profile is for DISTRIBUTION (App Store)
+          - abdul
         certificates:
-          - development_Certificates # Make sure this certificate is for DISTRIBUTION
+          - development_Certificates
     cache:
       cache_paths:
         - ~/.pub-cache
@@ -31,28 +30,35 @@ workflows:
       branch_patterns:
         - pattern: 'main'
           include: true
-    scripts: # ONLY ONE SCRIPTS SECTION
+    scripts:
       - name: Install Flutter dependencies
         script: |
           flutter clean
           flutter pub get
+
       - name: Install CocoaPods dependencies
         script: |
           cd ios
-          pod install --repo-update # Simplified
+          pod install --repo-update
+
       - name: Flutter build
         script: |
-          flutter build ios --release --no-codesign # Important: No code signing here
+          flutter build ios --release --no-codesign
+
+      - name: Build iOS IPA
+        script: |
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath build/Runner.xcarchive \
+            archive
+          
+          xcodebuild -exportArchive \
+            -archivePath build/Runner.xcarchive \
+            -exportOptionsPlist exportOptions.plist \
+            -exportPath build/ios/ipa
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
-#    publishing:
-#      app_store_connect:
-#        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-#        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-#        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-#        submit_to_testflight: true  # Or false if you want to skip TestFlight
-#        submit_to_app_store: true
-#        beta_groups:
-#          - "Internal Testers" # Replace with your TestFlight group name
