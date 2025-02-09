@@ -7,7 +7,7 @@
     <key>teamID</key>
     <string>UVARSZGUFK</string>
     <key>signingStyle</key>
-    <string>automatßic</string>
+    <string>automatic</string>
     <key>stripSwiftSymbols</key>
     <true/>
     <key>uploadSymbols</key>
