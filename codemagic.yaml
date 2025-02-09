@@ -16,22 +16,11 @@ workflows:
       cocoapods: default
       flutter: stable
 
-      # Choose ONE of the following signing options:
-
-      # Option 1: Manual Signing (If you uploaded profiles and certificates)
-      ios_signing:
-        provisioning_profiles:
-          - tunedjobs # Name of the provisioning profile you uploaded
-        certificates:
-          - Distribution_Certificate # Name of the certificate you uploaded
-
-      # Option 2: Automatic Signing (Recommended if possible)
-      # ios_signing:
-      #   automatic: true
-      #   team_id: "YOUR_TEAM_ID" # Replace with your Apple Developer Team ID
-      #   distribution_type: app_store
-      #   bundle_identifier: tunedtech.uk.tunedJobs
-
+    ios_signing:
+      provisioning_profiles:
+        - tunedjobs # Name of the provisioning profile you uploaded
+      certificates:
+        - Distribution_Certificate # Name of the certificate you uploaded
 
     scripts:
       - name: Install Flutter dependencies
@@ -48,27 +37,19 @@ workflows:
         script: |
           flutter build ios --release --no-codesign # Important: No codesign here!
 
-      - name: Build and Sign IPA (Recommended)
+      - name: Build and Sign IPA
         script: |
-          flutter build ios --release --export-options=ios/exportOptions.plist
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath build/Runner.xcarchive \
+            archive
 
-      # OR, if you MUST use xcodebuild directly:
-      # - name: Build iOS IPA (Alternative)
-      #   script: |
-      #     cd ios
-      #     xcodebuild -workspace Runner.xcworkspace \
-      #       -scheme Runner \
-      #       -configuration Release \
-      #       -archivePath build/Runner.xcarchive \
-      #       archive \
-      #       -allowProvisioningUpdates \
-      #       DEVELOPMENT_TEAM="YOUR_TEAM_ID" # Your Team ID (if manual signing)
-
-      #     xcodebuild -exportArchive \
-      #       -archivePath build/Runner.xcarchive \
-      #       -exportOptionsPlist ios/exportOptions.plist \
-      #       -exportPath build/ios/ipa \
-      #       -allowProvisioningUpdates
+          xcodebuild -exportArchive \
+            -archivePath build/Runner.xcarchive \
+            -exportOptionsPlist ios/exportOptions.plist \
+            -exportPath build/ios/ipa
 
     artifacts:
       - build/ios/ipa/*.ipa  # Correct path
