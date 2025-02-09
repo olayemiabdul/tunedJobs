@@ -19,7 +19,7 @@ workflows:
         provisioning_profiles:
           - abdul
         certificates:
-          - distribution_Certificates  # Changed from development to distribution
+          - development_Certificates # Changed from development to distribution
     scripts:
       - name: Set up code signing
         script: |
