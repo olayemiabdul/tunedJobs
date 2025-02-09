@@ -15,17 +15,23 @@ workflows:
       xcode: "15.0" # Or specify the Xcode version you need
       cocoapods: default
       flutter: stable
+
+      # Choose ONE of the following signing options:
+
+      # Option 1: Manual Signing (If you uploaded profiles and certificates)
       ios_signing:
-        distribution_type: app_store # Use this for App Store submission
-        bundle_identifier: tunedtech.uk.tunedJobs # Ensure this is correct!
-        provisioning_profiles: # Use automatic signing or manual
+        provisioning_profiles:
           - tunedjobs # Name of the provisioning profile you uploaded
         certificates:
           - Distribution_Certificate # Name of the certificate you uploaded
-      # OR, if using AUTOMATIC signing:
+
+      # Option 2: Automatic Signing (Recommended if possible)
       # ios_signing:
       #   automatic: true
-      #   team_id: "YOUR_TEAM_ID" # Your Apple Developer Team ID
+      #   team_id: "YOUR_TEAM_ID" # Replace with your Apple Developer Team ID
+      #   distribution_type: app_store
+      #   bundle_identifier: tunedtech.uk.tunedJobs
+
 
     scripts:
       - name: Install Flutter dependencies
@@ -41,17 +47,6 @@ workflows:
       - name: Flutter build
         script: |
           flutter build ios --release --no-codesign # Important: No codesign here!
-
-      # The following scripts are likely redundant or incorrect
-      # CodeMagic's built-in signing handles this
-      # - name: keychian
-      #   script: keychain initialize
-      # - name: add certificate
-      #   script: keychain add-certificates
-      # - name: xcode
-      #   script: xcode-project use-profiles
-      # - name: packages
-      #   script: flutter-packages-pub-get
 
       - name: Build and Sign IPA (Recommended)
         script: |
@@ -86,4 +81,4 @@ workflows:
         submit_to_testflight: true  # Or false
         submit_to_app_store: true
         beta_groups:
-          - "Internal Testers" # Replace with your TestFlight group name
+          - "tuned group" # Replace with your TestFlight group name
