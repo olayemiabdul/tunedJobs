@@ -5,8 +5,10 @@
     <key>method</key>
     <string>app-store</string>
     <key>teamID</key>
-    <string>UVARSZGUFK</string>  <key>signingStyle</key>
-    <string>automatic</string>  <key>stripSwiftSymbols</key>
+    <string>UVARSZGUFK</string>
+    <key>signingStyle</key>
+    <string>automatic</string>
+    <key>stripSwiftSymbols</key>
     <true/>
     <key>uploadSymbols</key>
     <true/>

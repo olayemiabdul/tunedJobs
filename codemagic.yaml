@@ -4,7 +4,7 @@ workflows:
     instance_type: mac_mini_m1
     environment:
       vars:
-        BUNDLE_ID: "tunedtech.uk.tunedJobs" # Ensure this is correct
+        BUNDLE_ID: "tunedtech.uk.tunedJobs"
         XCODE_WORKSPACE: "ios/Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
         APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY
@@ -12,28 +12,22 @@ workflows:
         APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
         FLUTTER_DEBUG: true
         COCOAPODS_DISABLE_STATS: true
-      xcode: "15.0" # Or specify the Xcode version you need
+      xcode: "15.0"
       cocoapods: default
       flutter: stable
 
-      # Choose ONE of the following signing options:
-
-      # Option 1: Manual Signing (If you uploaded profiles and certificates)
       ios_signing:
-        provisioning_profiles:
-          - tunedjobs # Name of the provisioning profile you uploaded
-        certificates:
-          - Distribution_Certificate # Name of the certificate you uploaded
-
-      # Option 2: Automatic Signing (Recommended if possible)
-      # ios_signing:
-      #   automatic: true
-      #   team_id: "YOUR_TEAM_ID" # Replace with your Apple Developer Team ID
-      #   distribution_type: app_store
-      #   bundle_identifier: tunedtech.uk.tunedJobs
-
+        automatic: true
+        team_id: "UVARSZGUFK"
+        distribution_type: app_store
+        bundle_identifier: tunedtech.uk.tunedJobs
 
     scripts:
+      - name: Set up environment
+        script: |
+          flutter doctor -v
+          xcodebuild -version
+
       - name: Install Flutter dependencies
         script: |
           flutter clean
@@ -44,41 +38,38 @@ workflows:
           cd ios
           pod install --repo-update
 
-      - name: Flutter build
+      - name: Build and Sign IPA
         script: |
-          flutter build ios --release --no-codesign # Important: No codesign here!
+          cd ios
+          # Create archive
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath build/Runner.xcarchive \
+            archive \
+            -allowProvisioningUpdates
 
-      - name: Build and Sign IPA (Recommended)
-        script: |
-          flutter build ios --release --export-options=ios/exportOptions.plist
-
-      # OR, if you MUST use xcodebuild directly:
-      # - name: Build iOS IPA (Alternative)
-      #   script: |
-      #     cd ios
-      #     xcodebuild -workspace Runner.xcworkspace \
-      #       -scheme Runner \
-      #       -configuration Release \
-      #       -archivePath build/Runner.xcarchive \
-      #       archive \
-      #       -allowProvisioningUpdates \
-      #       DEVELOPMENT_TEAM="YOUR_TEAM_ID" # Your Team ID (if manual signing)
-
-      #     xcodebuild -exportArchive \
-      #       -archivePath build/Runner.xcarchive \
-      #       -exportOptionsPlist ios/exportOptions.plist \
-      #       -exportPath build/ios/ipa \
-      #       -allowProvisioningUpdates
+          # Export IPA
+          xcodebuild -exportArchive \
+            -archivePath build/Runner.xcarchive \
+            -exportOptionsPlist exportOptions.plist \
+            -exportPath build/ios/ipa \
+            -allowProvisioningUpdates
 
     artifacts:
-      - build/ios/ipa/*.ipa  # Correct path
+      - build/ios/ipa/*.ipa
 
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true  # Or false
+        submit_to_testflight: true
         submit_to_app_store: true
         beta_groups:
-          - "tuned group" # Replace with your TestFlight group name
+          - "tuned group"
+
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
+        - $HOME/Library/Developer/Xcode/DerivedData
