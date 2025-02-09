@@ -13,14 +13,14 @@ workflows:
         # Optional:
         FLUTTER_DEBUG: true
         COCOAPODS_DISABLE_STATS: true
-    xcode: "15.0" # Or "latest" for the latest Xcode 15.x
-    cocoapods: default
-    flutter: stable
-    ios_signing:
-      provisioning_profiles:
-        - abdul # Make sure this profile is for DISTRIBUTION (App Store)
-      certificates:
-        - development_Certificates # Make sure this certificate is for DISTRIBUTION
+      xcode: "15.0" # Or "latest" for the latest Xcode 15.x
+      cocoapods: default
+      flutter: stable
+      ios_signing:
+        provisioning_profiles:
+          - abdul # Make sure this profile is for DISTRIBUTION (App Store)
+        certificates:
+          - development_Certificates # Make sure this certificate is for DISTRIBUTION
     cache:
       cache_paths:
         - ~/.pub-cache
@@ -31,7 +31,7 @@ workflows:
       branch_patterns:
         - pattern: 'main'
           include: true
-    scripts:
+    scripts: # ONLY ONE SCRIPTS SECTION
       - name: Install Flutter dependencies
         script: |
           flutter clean
@@ -40,7 +40,6 @@ workflows:
         script: |
           cd ios
           pod install --repo-update # Simplified
-
       - name: Flutter build
         script: |
           flutter build ios --release --no-codesign # Important: No code signing here
