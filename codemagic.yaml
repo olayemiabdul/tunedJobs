@@ -50,7 +50,7 @@ workflows:
 
       - name: Build and Sign IPA (Recommended)
         script: |
-          flutter build ios --release --export-options-plist=ios/exportOptions.plist
+          flutter build ios --release --export-options=ios/exportOptions.plist
 
       # OR, if you MUST use xcodebuild directly:
       # - name: Build iOS IPA (Alternative)
