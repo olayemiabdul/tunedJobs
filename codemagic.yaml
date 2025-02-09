@@ -15,12 +15,12 @@ workflows:
       xcode: "15.0"
       cocoapods: default
       flutter: stable
-
       ios_signing:
-        automatic: true
-        team_id: "UVARSZGUFK"
         distribution_type: app_store
         bundle_identifier: tunedtech.uk.tunedJobs
+        code_signing_identity: "iPhone Distribution"
+        provisioning_profiles:
+          "tunedtech.uk.tunedJobs": "Tuned Jobs App Store"  # Replace with your actual profile name
 
     scripts:
       - name: Set up environment
