@@ -19,7 +19,7 @@ workflows:
         provisioning_profiles:
           - abdul
         certificates:
-          - distribution_Certificates
+          - development_Certificates
     scripts:
       - name: Install Flutter dependencies
         script: |
