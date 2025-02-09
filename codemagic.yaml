@@ -44,7 +44,9 @@ workflows:
         script: |
           flutter build ios --release --no-codesign # Important: No code signing here
     artifacts:
-      - build/ios/ipa/*.ipa  # Or the correct path if different
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
 #    publishing:
 #      app_store_connect:
 #        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
