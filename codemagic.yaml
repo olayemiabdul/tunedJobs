@@ -19,12 +19,8 @@ workflows:
         provisioning_profiles:
           - abdul
         certificates:
-          - development_Certificates # Changed from development to distribution
+          - distribution_Certificates
     scripts:
-      - name: Set up code signing
-        script: |
-          keychain initialize
-
       - name: Install Flutter dependencies
         script: |
           flutter clean
@@ -35,15 +31,9 @@ workflows:
           cd ios
           pod install --repo-update
 
-      - name: Update Pod deployment targets
-        script: |
-          cd ios
-          sed -i '' 's/platform :ios, '"'"'.*'"'"'/platform :ios, '"'"'12.0'"'"'/' Podfile
-          pod install
-
       - name: Flutter build
         script: |
-          flutter build ios --release
+          flutter build ios --release --no-codesign
 
       - name: Build iOS IPA
         script: |
@@ -53,14 +43,14 @@ workflows:
             -configuration Release \
             -archivePath build/Runner.xcarchive \
             archive \
-            CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE="abdul" \
-            DEVELOPMENT_TEAM="ABDULLAHI AFOLARIN"  # Replace with your team ID
-          
+            -allowProvisioningUpdates \
+            DEVELOPMENT_TEAM="UVARSZGUFK"
+
           xcodebuild -exportArchive \
             -archivePath build/Runner.xcarchive \
             -exportOptionsPlist exportOptions.plist \
-            -exportPath build/ios/ipa
+            -exportPath build/ios/ipa \
+            -allowProvisioningUpdates
     artifacts:
       - ios/build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
