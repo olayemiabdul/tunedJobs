@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tuned_jobs/refactored%20code/welcomePage.dart';
+import 'package:tuned_jobs/screens/welcomePage.dart';
+
 
 
 import '../Auth/authScreen.dart';

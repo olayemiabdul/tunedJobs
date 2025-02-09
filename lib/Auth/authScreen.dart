@@ -9,9 +9,10 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tuned_jobs/Auth/register.dart';
-import 'package:tuned_jobs/refactored%20code/bottomNav.dart';
 
 
+
+import '../screens/bottomNav.dart';
 import 'forgotpassword.dart';
 import '../main.dart';
 

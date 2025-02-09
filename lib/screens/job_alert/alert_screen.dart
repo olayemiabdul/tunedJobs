@@ -465,13 +465,13 @@ class _JobAlertPageState extends State<JobAlertPage> {
         title: Text(showList ? 'Job Alerts' : 'Create Job Alert'),
         actions: [
           if (showList)
-            IconButton(
+           TextButton.icon(
               icon: const Icon(Icons.add),
               onPressed: () {
                 setState(() {
                   showList = false;
                 });
-              },
+              }, label:const Text('New Alert') ,
             )
         ],
       ),

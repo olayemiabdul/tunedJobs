@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:tuned_jobs/provider/favouriteProvider.dart';
-import 'package:tuned_jobs/screen/firstPage.dart';
+
+import 'package:tuned_jobs/screens/firstPage.dart';
 import 'package:tuned_jobs/utils.dart';
 
 import 'Auth/emailverification.dart';

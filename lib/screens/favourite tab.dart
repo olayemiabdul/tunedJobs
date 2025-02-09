@@ -4,8 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:tuned_jobs/refactored%20code/savedJobs.dart';
-import 'package:tuned_jobs/refactored%20code/saved_applied.dart';
+
+import 'package:tuned_jobs/screens/savedJobs.dart';
+import 'package:tuned_jobs/screens/saved_applied.dart';
 
 import '../provider/favouriteProvider.dart';
  // This should contain your AppliedJobsPage widget

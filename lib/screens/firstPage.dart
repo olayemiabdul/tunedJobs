@@ -12,7 +12,8 @@ import 'package:provider/provider.dart';
 
 import '../main.dart';
 import '../provider/favouriteProvider.dart';
-import '../refactored code/bottomNav.dart';
+import 'bottomNav.dart';
+
 
 class ShowUpAnimation extends StatefulWidget {
   final Widget child;

@@ -8,7 +8,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../main.dart';
-import '../refactored code/bottomNav.dart';
+
+import '../screens/bottomNav.dart';
 import 'authScreen.dart';
 
 class SignUpScreen extends StatefulWidget {

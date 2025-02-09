@@ -14,7 +14,8 @@ import 'package:tuned_jobs/model/networkservices.dart';
 
 import '../model/cvlibraryJob.dart';
 import '../model/jobdescription.dart';
-import '../refactored code/jobs_details.dart';
+
+import '../screens/jobs_details.dart';
 import 'favouriteProvider.dart';
 
 

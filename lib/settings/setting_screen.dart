@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -5,12 +7,50 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../main.dart';
-import '../screen/firstPage.dart';
+
+import '../screens/firstPage.dart';
 import 'contactPage.dart';
 
-class SettingsPageScreen extends StatelessWidget {
+class SettingsPageScreen extends StatefulWidget {
   const SettingsPageScreen({super.key});
 
+  @override
+  State<SettingsPageScreen> createState() => _SettingsPageScreenState();
+}
+
+class _SettingsPageScreenState extends State<SettingsPageScreen> {
+  String androidAppId = 'tunedtech.uk.tuned_jobs';
+  String iosAppId = '6741690717';
+
+
+
+  Future<void> rateUs() async {
+    final String url = Platform.isAndroid
+        ? 'https://play.google.com/store/apps/details?id=$androidAppId'
+        : 'https://apps.apple.com/app/id$iosAppId';
+
+    try {
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        throw 'Could not launch $url';
+      }
+    } catch (e) {
+      debugPrint('Error launching URL: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> shareApp(BuildContext context) async {
+    final String shareUrl = Platform.isAndroid
+        ? 'https://play.google.com/store/apps/details?id=$androidAppId'
+        : 'https://apps.apple.com/app/id$iosAppId';
+
+    await Share.share(
+      'Check out this amazing app: $shareUrl',
+      subject: 'Share Our App',
+    );
+  }
   privacyPolicy() async {
     const termsUrl =
         'https://doc-hosting.flycricket.io/tuned-jobs-privacy-policy/d8474bc1-13cf-4365-9c1d-1d60a9051883/privacy';
@@ -31,14 +71,7 @@ class SettingsPageScreen extends StatelessWidget {
     }
   }
 
-  rateUs() async {
-    const url = 'https://play.google.com/store/apps/details?id=com.tunedjobs.ukjobsearch';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+
 
   contactUs(BuildContext context) {
     Navigator.push(
@@ -47,11 +80,7 @@ class SettingsPageScreen extends StatelessWidget {
     );
   }
 
-  shareApp(BuildContext context) {
-    Share.share(
-        'Check out this amazing app: https://play.google.com/store/apps/details?id=com.tunedjobs.ukjobsearch',
-        subject: 'Share Our App');
-  }
+
 
   deleteAccount(BuildContext context) async {
     try {
@@ -84,7 +113,6 @@ class SettingsPageScreen extends StatelessWidget {
       const SnackBar(content: Text('Logged out successfully.')),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
