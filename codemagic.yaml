@@ -43,12 +43,14 @@ workflows:
       - name: Flutter build
         script: |
           flutter build ios --release --no-codesign # Important: No code signing here
-    publishing:
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
-        submit_to_app_store: true
-        beta_groups:
-          - "tuned group"
+    artifacts:
+      - build/ios/ipa/*.ipa  # Or the correct path if different
+#    publishing:
+#      app_store_connect:
+#        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+#        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+#        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+#        submit_to_testflight: true  # Or false if you want to skip TestFlight
+#        submit_to_app_store: true
+#        beta_groups:
+#          - "Internal Testers" # Replace with your TestFlight group name
