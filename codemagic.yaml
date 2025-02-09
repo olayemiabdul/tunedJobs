@@ -19,18 +19,12 @@ workflows:
         provisioning_profiles:
           - abdul
         certificates:
-          - development_Certificates
-    cache:
-      cache_paths:
-        - ~/.pub-cache
-        - $FLUTTER_ROOT/.pub-cache
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: 'main'
-          include: true
+          - distribution_Certificates  # Changed from development to distribution
     scripts:
+      - name: Set up code signing
+        script: |
+          keychain initialize
+
       - name: Install Flutter dependencies
         script: |
           flutter clean
@@ -41,21 +35,28 @@ workflows:
           cd ios
           pod install --repo-update
 
+      - name: Update Pod deployment targets
+        script: |
+          cd ios
+          sed -i '' 's/platform :ios, '"'"'.*'"'"'/platform :ios, '"'"'12.0'"'"'/' Podfile
+          pod install
+
       - name: Flutter build
         script: |
-          flutter build ios --release --no-codesign
+          flutter build ios --release
 
       - name: Build iOS IPA
         script: |
           cd ios
-          # First, create the archive
           xcodebuild -workspace Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
             -archivePath build/Runner.xcarchive \
-            archive
+            archive \
+            CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE="abdul" \
+            DEVELOPMENT_TEAM="ABDULLAHI AFOLARIN"  # Replace with your team ID
           
-          # Then, export the archive to create IPA
           xcodebuild -exportArchive \
             -archivePath build/Runner.xcarchive \
             -exportOptionsPlist exportOptions.plist \
