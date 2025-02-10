@@ -1,39 +1,25 @@
 workflows:
-  ios-workflow:
-    name: tuned Ios
-    instance_type: mac_mini_m1
+  ios-method-1:
+    name: iOS Build and Release
     environment:
-      vars:
-        BUNDLE_ID: "tunedtech.uk.tunedJobs" # Ensure this is correct
-        XCODE_WORKSPACE: "ios/Runner.xcworkspace"
-        XCODE_SCHEME: "Runner"
-        APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY
-        APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
-        FLUTTER_DEBUG: true
-        COCOAPODS_DISABLE_STATS: true
-        IPHONEOS_DEPLOYMENT_TARGET: "12.0" # Update to match supported versions
-      xcode: "15.0" # Or specify the Xcode version you need
-      cocoapods: default
-      flutter: stable
-
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.tunedtech.uk.tunedJobs  # ✅ Corrected Bundle Identifier
     scripts:
-      - name: Install Flutter dependencies
+      - name: Install Dependencies
         script: |
-          flutter clean
           flutter pub get
-
-      - name: Install CocoaPods dependencies
-        script: |
           cd ios
-          sed -i '' 's/platform :ios, '9.0'/platform :ios, '12.0'/' Podfile # Ensure correct deployment target
           pod install --repo-update
 
-      - name: Flutter build
-        script: |
-          flutter build ios --release --no-codesign # Important: No codesign here!
+      - name: Increment Build Number
+        script: flutter pub run version:bump patch  # Adjust as needed
 
-      - name: Build and Sign IPA
+      - name: Build Flutter App (No Signing)
+        script: |
+          flutter build ios --release --no-codesign  # Important: No codesign here!
+
+      - name: Export IPA
         script: |
           cd ios
           xcodebuild -workspace Runner.xcworkspace \
@@ -48,14 +34,9 @@ workflows:
             -exportPath build/ios/ipa
 
     artifacts:
-      - build/ios/ipa/*.ipa  # Correct path
+      - build/ios/ipa/*.ipa  # ✅ Downloadable IPA file
 
     publishing:
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true  # Or false
-        submit_to_app_store: true
-        beta_groups:
-          - "tuned group" # Replace with your TestFlight group name
+      email:
+        recipients:
+          - your.email@example.com  # **Your email for receiving the build**
