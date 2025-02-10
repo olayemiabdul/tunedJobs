@@ -4,7 +4,7 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.tunedtech.uk.tunedJobs  # ✅ Corrected Bundle Identifier
+        bundle_identifier: tunedtech.uk.tunedJobs  # ✅ Corrected Bundle Identifier
     scripts:
       - name: Install Dependencies
         script: |
