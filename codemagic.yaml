@@ -9,6 +9,9 @@ workflows:
         XCODE_SCHEME: "Runner"  # Updated scheme name
         BUNDLE_ID: "com.tunedtech.uk.tunedJobs"  # Corrected bundle identifier
     scripts:
+      - name: Install Flutter dependencies
+        script: |
+          flutter pub get
       - name: Install CocoaPods dependencies
         script: |
           cd ios
