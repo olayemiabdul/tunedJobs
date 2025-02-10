@@ -1,42 +1,34 @@
 workflows:
-  ios-method-1:
-    name: iOS Build and Release
+  ios-native-workflow:
+    name: iOS Native
+    max_build_duration: 120
+    instance_type: mac_mini_m2
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: tunedtech.uk.tunedJobs  # ✅ Corrected Bundle Identifier
+      vars:
+        XCODE_WORKSPACE: "YourWorkspace.xcworkspace" # **YOUR WORKSPACE NAME** (or .xcodeproj)
+        XCODE_SCHEME: "YourScheme"                # **YOUR SCHEME NAME**
+        BUNDLE_ID: "tunedtech.uk.tunedJobs"       # Your bundle identifier
     scripts:
-      - name: Install Dependencies
+      - name: Install CocoaPods dependencies
         script: |
-          flutter pub get
-          cd ios
-          pod install --repo-update
-
-      - name: Increment Build Number
-        script: flutter pub run version:bump patch  # Adjust as needed
-
-      - name: Build Flutter App (No Signing)
+          pod install
+      - name: Set up provisioning profiles settings on Xcode project
+        script: xcode-project use-profiles
+      - name: Build ipa for distribution
         script: |
-          flutter build ios --release --no-codesign  # Important: No codesign here!
-
-      - name: Export IPA
-        script: |
-          cd ios
-          xcodebuild -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -archivePath build/Runner.xcarchive \
-            archive
-
-          xcodebuild -exportArchive \
-            -archivePath build/Runner.xcarchive \
-            -exportOptionsPlist ios/exportOptions.plist \
-            -exportPath build/ios/ipa
+          xcode-project build-ipa \
+            --workspace "$CM_BUILD_DIR/$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME" \
+            --export-method ad-hoc \ # Use ad-hoc method
+            --bundle-identifier "$BUNDLE_ID"
 
     artifacts:
-      - build/ios/ipa/*.ipa  # ✅ Downloadable IPA file
-
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
     publishing:
-      email:
+      email: # Optional: If you want to be notified
         recipients:
-          - your.email@example.com  # **Your email for receiving the build**
+          - user_1@example.com
+          - user_2@example.com
