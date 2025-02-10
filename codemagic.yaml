@@ -1,6 +1,6 @@
 workflows:
   ios-method-1:
-    name: iOS Build and Release
+    name: Tuned iOS Build and Release
     environment:
       ios_signing:
         distribution_type: app_store
