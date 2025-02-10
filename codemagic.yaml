@@ -1,24 +1,44 @@
 workflows:
-  ios-native-workflow:
-    name: iOS Native
-    max_build_duration: 120
-    instance_type: mac_mini_m2
+  ios-workflow:
+    name: tuned Ios
+    instance_type: mac_mini_m1
     environment:
       vars:
-        XCODE_WORKSPACE: "ios/Runner.xcworkspace" # Updated workspace name
-        XCODE_SCHEME: "Runner"  # Updated scheme name
-        BUNDLE_ID: "com.tunedtech.uk.tunedJobs"  # Corrected bundle identifier
+        BUNDLE_ID: "tunedtech.uk.tunedJobs" # Ensure this is correct
+        XCODE_WORKSPACE: "ios/Runner.xcworkspace"
+        XCODE_SCHEME: "Runner"
+        APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY
+        APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
+        FLUTTER_DEBUG: true
+        COCOAPODS_DISABLE_STATS: true
+        IPHONEOS_DEPLOYMENT_TARGET: "12.0" # Update to match supported versions
+      xcode: "15.0" # Or specify the Xcode version you need
+      cocoapods: default
+      flutter: stable
+
     scripts:
+      - name: Install Flutter dependencies
+        script: |
+          flutter clean
+          flutter pub get
+
       - name: Install CocoaPods dependencies
         script: |
           cd ios
+          sed -i '' 's/platform :ios, '9.0'/platform :ios, '12.0'/' Podfile # Ensure correct deployment target
+          find Pods -name "*.podspec" -exec sed -i '' 's/\(s\.ios\.deployment_target\s*=\s*\)\("9.0"\|"10.0"\)/\112.0/' {} \; # Update all pod dependencies
           pod install --repo-update
-      - name: Set up provisioning profiles settings on Xcode project
-        script: xcode-project use-profiles
-      - name: Build ipa for distribution
+
+      - name: Flutter build
         script: |
-          xcodebuild -workspace "$XCODE_WORKSPACE" \
-            -scheme "$XCODE_SCHEME" \
+          flutter build ios --release --no-codesign # Important: No codesign here!
+
+      - name: Build and Sign IPA
+        script: |
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
             -configuration Release \
             -archivePath build/Runner.xcarchive \
             archive
@@ -29,12 +49,14 @@ workflows:
             -exportPath build/ios/ipa
 
     artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+      - build/ios/ipa/*.ipa  # Correct path
+
     publishing:
-      email:
-        recipients:
-          - user_1@example.com
-          - user_2@example.com
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true  # Or false
+        submit_to_app_store: true
+        beta_groups:
+          - "tuned group" # Replace with your TestFlight group name
