@@ -4,7 +4,7 @@ workflows:
     instance_type: mac_mini_m1
     environment:
       vars:
-        BUNDLE_ID: "tunedtech.uk.tunedJobs" # Ensure this is correct
+        BUNDLE_ID: "tunedtech.uk.tunedJobs"
         XCODE_WORKSPACE: "ios/Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
         APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY
@@ -12,51 +12,49 @@ workflows:
         APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
         FLUTTER_DEBUG: true
         COCOAPODS_DISABLE_STATS: true
-        IPHONEOS_DEPLOYMENT_TARGET: "12.0" # Update to match supported versions
-      xcode: "15.0" # Or specify the Xcode version you need
+        IPHONEOS_DEPLOYMENT_TARGET: "12.0"
+      xcode: "15.0"
       cocoapods: default
       flutter: stable
 
     scripts:
-      - name: Install Flutter dependencies
+      - name: Clean and Setup Environment
         script: |
           flutter clean
+          rm -rf ios/Pods
+          rm -rf ios/Podfile.lock
+          rm -rf ios/.symlinks
+          rm -rf ios/Flutter/Flutter.framework
+          rm -rf ios/Flutter/Flutter.podspec
           flutter pub get
 
-      - name: Install CocoaPods dependencies
+      - name: Pod Setup and Install
         script: |
           cd ios
-          sed -i '' 's/platform :ios, '9.0'/platform :ios, '12.0'/' Podfile # Ensure correct deployment target
-          find Pods -name "*.podspec" -exec sed -i '' 's/\(s\.ios\.deployment_target\s*=\s*\)\("9.0"\|"10.0"\)/\112.0/' {} \; # Update all pod dependencies
+          pod deintegrate
+          pod cache clean --all
+          sed -i '' 's/platform :ios, '9.0'/platform :ios, '12.0'/' Podfile
+          find . -name "*.podspec" -exec sed -i '' 's/\(s\.ios\.deployment_target\s*=\s*\)\("9.0"\|"10.0"\)/\112.0/' {} \;
           pod install --repo-update
+          cd ..
 
-      - name: Flutter build
+      - name: Configure Xcode Project
         script: |
-          flutter build ios --release --no-codesign # Important: No codesign here!
+          xcode-project use-profiles
 
-      - name: Build and Sign IPA
+      - name: Build IPA
         script: |
-          cd ios
-          xcodebuild -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -archivePath build/Runner.xcarchive \
-            archive
-
-          xcodebuild -exportArchive \
-            -archivePath build/Runner.xcarchive \
-            -exportOptionsPlist ios/exportOptions.plist \
-            -exportPath build/ios/ipa
+          flutter build ipa --release --export-options-plist /Users/builder/export_options.plist
 
     artifacts:
-      - build/ios/ipa/*.ipa  # Correct path
+      - build/ios/ipa/*.ipa
 
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true  # Or false
+        submit_to_testflight: true
         submit_to_app_store: true
         beta_groups:
-          - "tuned group" # Replace with your TestFlight group name
+          - "tuned group"
