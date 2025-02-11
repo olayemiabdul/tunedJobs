@@ -15,7 +15,7 @@ workflows:
       flutter: stable
       ios_signing:
         provisioning_profiles:
-          - "TunedJob"
+          - "tunedjobs"    # Changed from "TunedJob" to "tunedjobs"
 
     scripts:
       - name: Clean and Setup Environment
