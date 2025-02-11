@@ -112,6 +112,7 @@ flutter:
 
   assets:
     - assets/images/
+    - shorebird.yaml
 
 
 
